@@ -300,13 +300,34 @@ function MoodTracker() {
 
   return (
     <div className="nu" style={{ padding: "16px" }}>
-      <p style={{ fontSize: "13px", fontWeight: 700, color: "#7c4d7e", marginBottom: "12px" }}>How are you feeling today? 🌸</p>
+      {mood && (
+  <div
+    style={{
+      marginTop: "12px",
+      background: "#ffe4f1",
+      padding: "10px 14px",
+      borderRadius: "14px",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "8px",
+      color: "#7c4d7e",
+      fontWeight: 700,
+      fontSize: "14px"
+    }}
+  >
+    <span style={{ fontSize: "18px" }}>
+      {mood.emoji}
+    </span>
+
+    Feeling {mood.label} today
+  </div>
+)}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: "6px" }}>
         {MOODS.map((m) => (
           <button
             key={m.l}
-            onClick={() => setMood(m.l)}
+           onClick={() => setMood(m)}
             style={{
               display: "flex",
               flexDirection: "column",
