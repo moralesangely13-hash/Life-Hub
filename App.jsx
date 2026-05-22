@@ -911,112 +911,149 @@ function Sidebar({ open, setOpen, onHome, onSection, onSub, currentSection }) {
   const [fexp, setFexp] = useState({});
   const [q, setQ] = useState("");
 
+  const isMobile = () => window.innerWidth < 768;
   const tog = (id) => setExp((p) => ({ ...p, [id]: !p[id] }));
   const togF = (id) => setFexp((p) => ({ ...p, [id]: !p[id] }));
 
-  return (
-    <div
-      style={{
-        width: open ? "240px" : "52px",
-        flexShrink: 0,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        background: "linear-gradient(180deg,#fdf0f7 0%,#faf0ff 100%)",
-        borderRight: "1px solid #fce4ec",
-        transition: "width .28s ease",
-        overflow: "hidden",
-        zIndex: 20,
-        position: "relative",
-      }}
-    >
-      <div style={{ padding: "14px", display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid #fce4ec", flexShrink: 0 }}>
-        <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "linear-gradient(135deg,#f9a8d4,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", flexShrink: 0 }}>🌸</div>
-        {open && <span className="pf nu" style={{ fontSize: "20px", fontWeight: 700, color: "#5d3060", letterSpacing: "-0.5px" }}>bloom</span>}
-      </div>
+  const handleCategoryClick = (s) => {
+    onSection(s);
+    if (open) tog(s.id);
+    if (isMobile()) setOpen(false);
+  };
 
+  const handleSubClick = (s, sub) => {
+    onSub(s, sub);
+    if (isMobile()) setOpen(false);
+  };
+
+  const handleHomeClick = () => {
+    onHome();
+    if (isMobile()) setOpen(false);
+  };
+
+  return (
+    <>
       {open && (
-        <div style={{ padding: "10px 12px", flexShrink: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.7)", border: "1px solid #fce4ec", borderRadius: "10px", padding: "6px 10px" }}>
-            <Search size={13} color="#f9a8d4" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search..." style={{ background: "transparent", border: "none", outline: "none", fontSize: "12px", color: "#7c4d7e", width: "100%", fontFamily: "Nunito,sans-serif" }} />
-          </div>
-        </div>
+        <div
+          onClick={() => setOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.12)",
+            zIndex: 15,
+            display: window.innerWidth < 768 ? "block" : "none",
+          }}
+        />
       )}
 
-      <nav className="scroll" style={{ flex: 1, overflowY: "auto", padding: "4px 0" }}>
-        <button onClick={onHome} className="nu" style={{ width: "100%", display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", color: "#7c4d7e", fontSize: "13px", fontWeight: 600 }}>
-          <span style={{ fontSize: "17px", flexShrink: 0 }}>🏠</span>
-          {open && <span>Dashboard</span>}
-        </button>
+      <div
+        style={{
+          width: open ? "240px" : "52px",
+          flexShrink: 0,
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          background: "linear-gradient(180deg,#fdf0f7 0%,#faf0ff 100%)",
+          borderRight: "1px solid #fce4ec",
+          transition: "width .28s ease, transform .28s ease",
+          overflow: "hidden",
+          zIndex: 20,
+          position: window.innerWidth < 768 ? "fixed" : "relative",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          transform: window.innerWidth < 768 && !open ? "translateX(-100%)" : "translateX(0)",
+          boxShadow: window.innerWidth < 768 && open ? "8px 0 30px rgba(249,168,212,0.25)" : "none",
+        }}
+      >
+        <div style={{ padding: "14px", display: "flex", alignItems: "center", gap: "10px", borderBottom: "1px solid #fce4ec", flexShrink: 0 }}>
+          <div style={{ width: "30px", height: "30px", borderRadius: "50%", background: "linear-gradient(135deg,#f9a8d4,#c084fc)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", flexShrink: 0 }}>🌸</div>
+          {open && <span className="pf nu" style={{ fontSize: "20px", fontWeight: 700, color: "#5d3060", letterSpacing: "-0.5px" }}>bloom</span>}
+        </div>
 
-        {NAV.map((s) => {
-          const match = !q || s.label.toLowerCase().includes(q.toLowerCase()) ||
-            (s.subareas || []).some((x) => x.toLowerCase().includes(q.toLowerCase())) ||
-            (s.folders || []).some((f) => f.subareas.some((x) => x.toLowerCase().includes(q.toLowerCase())));
-
-          if (!match) return null;
-
-          return (
-            <div key={s.id}>
-              <button
-                onClick={() => open ? tog(s.id) : onSection(s)}
-                className="nu"
-                style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  padding: "10px 14px",
-                  background: currentSection?.id === s.id ? "#fce8f3" : "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "#7c4d7e",
-                  fontSize: "13px",
-                  fontWeight: 600,
-                }}
-              >
-                <span style={{ fontSize: "17px", flexShrink: 0 }}>{s.emoji}</span>
-                {open && (
-                  <>
-                    <span style={{ flex: 1, textAlign: "left" }}>{s.label}</span>
-                    {exp[s.id] ? <ChevronDown size={12} color="#f9a8d4" /> : <ChevronRight size={12} color="#f9a8d4" />}
-                  </>
-                )}
-              </button>
-
-              {open && exp[s.id] && (
-                <div style={{ marginLeft: "28px", borderLeft: "1px solid #fce4ec", paddingLeft: "8px" }}>
-                  {s.folders ? s.folders.map((f) => (
-                    <div key={f.id}>
-                      <button onClick={() => togF(f.id)} className="nu" style={{ width: "100%", display: "flex", alignItems: "center", gap: "6px", padding: "6px 8px", background: "none", border: "none", cursor: "pointer", color: "#c084fc", fontSize: "11px", fontWeight: 700, borderRadius: "8px" }}>
-                        <span>{f.emoji}</span>
-                        <span style={{ flex: 1, textAlign: "left" }}>{f.label}</span>
-                        {fexp[f.id] ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
-                      </button>
-
-                      {fexp[f.id] && f.subareas.filter((x) => !q || x.toLowerCase().includes(q.toLowerCase())).map((sub) => (
-                        <button key={sub} onClick={() => onSub(s, sub)} className="nu" style={{ display: "block", width: "100%", textAlign: "left", padding: "5px 8px", paddingLeft: "16px", background: "none", border: "none", cursor: "pointer", color: "#9d7fa0", fontSize: "11px", borderRadius: "8px" }}>
-                          {getEmoji(sub)} {sub}
-                        </button>
-                      ))}
-                    </div>
-                  )) : (s.subareas || []).filter((x) => !q || x.toLowerCase().includes(q.toLowerCase())).map((sub) => (
-                    <button key={sub} onClick={() => onSub(s, sub)} className="nu" style={{ display: "block", width: "100%", textAlign: "left", padding: "5px 8px", background: "none", border: "none", cursor: "pointer", color: "#9d7fa0", fontSize: "11px", borderRadius: "8px" }}>
-                      {getEmoji(sub)} {sub}
-                    </button>
-                  ))}
-                </div>
-              )}
+        {open && (
+          <div style={{ padding: "10px 12px", flexShrink: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "rgba(255,255,255,0.7)", border: "1px solid #fce4ec", borderRadius: "10px", padding: "6px 10px" }}>
+              <Search size={13} color="#f9a8d4" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search..." style={{ background: "transparent", border: "none", outline: "none", fontSize: "12px", color: "#7c4d7e", width: "100%", fontFamily: "Nunito,sans-serif" }} />
             </div>
-          );
-        })}
-      </nav>
+          </div>
+        )}
 
-      <button onClick={() => setOpen((p) => !p)} className="nu" style={{ padding: "12px", borderTop: "1px solid #fce4ec", background: "none", border: "none", cursor: "pointer", color: "#f9a8d4", fontSize: "12px", fontWeight: 700 }}>
-        {open ? "← collapse" : "→"}
-      </button>
-    </div>
+        <nav className="scroll" style={{ flex: 1, overflowY: "auto", padding: "4px 0" }}>
+          <button onClick={handleHomeClick} className="nu" style={{ width: "100%", display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", color: "#7c4d7e", fontSize: "13px", fontWeight: 600 }}>
+            <span style={{ fontSize: "17px", flexShrink: 0 }}>🏠</span>
+            {open && <span>Dashboard</span>}
+          </button>
+
+          {NAV.map((s) => {
+            const match = !q || s.label.toLowerCase().includes(q.toLowerCase()) ||
+              (s.subareas || []).some((x) => x.toLowerCase().includes(q.toLowerCase())) ||
+              (s.folders || []).some((f) => f.subareas.some((x) => x.toLowerCase().includes(q.toLowerCase())));
+
+            if (!match) return null;
+
+            return (
+              <div key={s.id}>
+                <button
+                  onClick={() => handleCategoryClick(s)}
+                  className="nu"
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "10px 14px",
+                    background: currentSection?.id === s.id ? "#fce8f3" : "none",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "#7c4d7e",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                  }}
+                >
+                  <span style={{ fontSize: "17px", flexShrink: 0 }}>{s.emoji}</span>
+                  {open && (
+                    <>
+                      <span style={{ flex: 1, textAlign: "left" }}>{s.label}</span>
+                      {exp[s.id] ? <ChevronDown size={12} color="#f9a8d4" /> : <ChevronRight size={12} color="#f9a8d4" />}
+                    </>
+                  )}
+                </button>
+
+                {open && exp[s.id] && (
+                  <div style={{ marginLeft: "28px", borderLeft: "1px solid #fce4ec", paddingLeft: "8px" }}>
+                    {s.folders ? s.folders.map((f) => (
+                      <div key={f.id}>
+                        <button onClick={() => togF(f.id)} className="nu" style={{ width: "100%", display: "flex", alignItems: "center", gap: "6px", padding: "6px 8px", background: "none", border: "none", cursor: "pointer", color: "#c084fc", fontSize: "11px", fontWeight: 700, borderRadius: "8px" }}>
+                          <span>{f.emoji}</span>
+                          <span style={{ flex: 1, textAlign: "left" }}>{f.label}</span>
+                          {fexp[f.id] ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+                        </button>
+
+                        {fexp[f.id] && f.subareas.filter((x) => !q || x.toLowerCase().includes(q.toLowerCase())).map((sub) => (
+                          <button key={sub} onClick={() => handleSubClick(s, sub)} className="nu" style={{ display: "block", width: "100%", textAlign: "left", padding: "5px 8px", paddingLeft: "16px", background: "none", border: "none", cursor: "pointer", color: "#9d7fa0", fontSize: "11px", borderRadius: "8px" }}>
+                            {getEmoji(sub)} {sub}
+                          </button>
+                        ))}
+                      </div>
+                    )) : (s.subareas || []).filter((x) => !q || x.toLowerCase().includes(q.toLowerCase())).map((sub) => (
+                      <button key={sub} onClick={() => handleSubClick(s, sub)} className="nu" style={{ display: "block", width: "100%", textAlign: "left", padding: "5px 8px", background: "none", border: "none", cursor: "pointer", color: "#9d7fa0", fontSize: "11px", borderRadius: "8px" }}>
+                        {getEmoji(sub)} {sub}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>
+
+        <button onClick={() => setOpen((p) => !p)} className="nu" style={{ padding: "12px", borderTop: "1px solid #fce4ec", background: "none", border: "none", cursor: "pointer", color: "#f9a8d4", fontSize: "12px", fontWeight: 700 }}>
+          {open ? "← collapse" : "→"}
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -1024,7 +1061,7 @@ export default function App() {
   const [page, setPage] = useState("dashboard");
   const [section, setSection] = useState(null);
   const [subarea, setSubarea] = useState(null);
-  const [sideOpen, setSideOpen] = useState(true);
+  const [sideOpen, setSideOpen] = useState(window.innerWidth >= 768);
 
   const goHome = () => {
     setPage("dashboard");
@@ -1060,7 +1097,7 @@ export default function App() {
 
       <Sidebar open={sideOpen} setOpen={setSideOpen} onHome={goHome} onSection={goSection} onSub={goSub} currentSection={section} />
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", zIndex: 1 }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative", zIndex: 1, width: "100%" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "10px 16px", borderBottom: "1px solid #fce4ec", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(12px)", flexShrink: 0 }}>
           <button onClick={() => setSideOpen((p) => !p)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "18px", color: "#f48fb1", padding: "4px", lineHeight: 1 }}>☰</button>
           <h1 className="pf" style={{ fontSize: "17px", color: "#5d3060", fontWeight: 700, flex: 1 }}>{titleMap[page]}</h1>
