@@ -39,19 +39,19 @@ const QUOTES = [
   "You are the main character 🎀",
 ];
 
-const moods = [
-  { emoji: '🌸', label: 'blooming' },
-  { emoji: '✨', label: 'inspired' },
-  { emoji: '🛋️', label: 'cozy' },
-  { emoji: '😴', label: 'tired' },
-  { emoji: '🌧️', label: 'meh' },
-  { emoji: '💪', label: 'motivated' },
-  { emoji: '😰', label: 'anxious' },
-  { emoji: '🥰', label: 'grateful' },
-  { emoji: '🌈', label: 'happy' },
-  { emoji: '🫠', label: 'overwhelmed' },
-  { emoji: '🍓', label: 'excited' },
-  { emoji: '🌻', label: 'hopeful' }
+const MOODS = [
+  { emoji: "🌸", label: "blooming" },
+  { emoji: "✨", label: "inspired" },
+  { emoji: "🛋️", label: "cozy" },
+  { emoji: "😴", label: "tired" },
+  { emoji: "🌧️", label: "meh" },
+  { emoji: "💪", label: "motivated" },
+  { emoji: "😰", label: "anxious" },
+  { emoji: "🥰", label: "grateful" },
+  { emoji: "🌈", label: "happy" },
+  { emoji: "🫠", label: "overwhelmed" },
+  { emoji: "🍓", label: "excited" },
+  { emoji: "🌻", label: "hopeful" },
 ];
 
 const HABITS = [
@@ -299,35 +299,14 @@ function MoodTracker() {
   const [mood, setMood] = useLS(`bloom_mood_${todayStr}`, null);
 
   return (
-    <div className="nu" style={{ padding: "16px" }}>
-      {mood && (
-  <div
-    style={{
-      marginTop: "12px",
-      background: "#ffe4f1",
-      padding: "10px 14px",
-      borderRadius: "14px",
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "8px",
-      color: "#7c4d7e",
-      fontWeight: 700,
-      fontSize: "14px"
-    }}
-  >
-    <span style={{ fontSize: "18px" }}>
-      {mood.emoji}
-    </span>
-
-    Feeling {mood.label} today
-  </div>
-)}
+    <div className="nu" style={{ padding: "16px", textAlign: "center" }}>
+      <p style={{ fontSize: "13px", fontWeight: 700, color: "#7c4d7e", marginBottom: "12px" }}>How are you feeling today? 🌸</p>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(6,1fr)", gap: "6px" }}>
         {MOODS.map((m) => (
           <button
-            key={m.l}
-           onClick={() => setMood(m)}
+            key={m.label}
+            onClick={() => setMood(m)}
             style={{
               display: "flex",
               flexDirection: "column",
@@ -337,17 +316,35 @@ function MoodTracker() {
               borderRadius: "12px",
               border: "none",
               cursor: "pointer",
-              background: mood === m.l ? "#fce4ec" : "transparent",
+              background: mood?.label === m.label ? "#fce4ec" : "transparent",
               fontFamily: "Nunito,sans-serif",
             }}
           >
-            <span style={{ fontSize: "18px" }}>{m.e}</span>
-            <span style={{ fontSize: "10px", color: "#f48fb1", fontWeight: 600 }}>{m.l}</span>
+            <span style={{ fontSize: "18px" }}>{m.emoji}</span>
+            <span style={{ fontSize: "10px", color: "#f48fb1", fontWeight: 600 }}>{m.label}</span>
           </button>
         ))}
       </div>
 
-      {mood && <p style={{ textAlign: "center", fontSize: "12px", color: "#f48fb1", marginTop: "8px", fontStyle: "italic" }}>Feeling {mood} today 💕</p>}
+      {mood && (
+        <div
+          style={{
+            marginTop: "12px",
+            background: "#ffe4f1",
+            padding: "10px 14px",
+            borderRadius: "14px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            color: "#7c4d7e",
+            fontWeight: 700,
+            fontSize: "14px"
+          }}
+        >
+          <span style={{ fontSize: "18px" }}>{mood.emoji}</span>
+          Feeling {mood.label} today
+        </div>
+      )}
     </div>
   );
 }
@@ -524,13 +521,11 @@ function WorkspaceView({ section, subarea, onBack }) {
       if (!files.length) return;
 
       const images = await Promise.all(
-        files
-          .filter((f) => f.type.startsWith("image/"))
-          .map(async (f) => ({
-            id: Date.now() + Math.random(),
-            src: await compressImage(f, 900, 0.68),
-            name: f.name,
-          }))
+        files.filter((f) => f.type.startsWith("image/")).map(async (f) => ({
+          id: Date.now() + Math.random(),
+          src: await compressImage(f, 900, 0.68),
+          name: f.name,
+        }))
       );
 
       setImgs((p) => [...p, ...images]);
@@ -546,17 +541,15 @@ function WorkspaceView({ section, subarea, onBack }) {
       if (!files.length) return;
 
       const images = await Promise.all(
-        files
-          .filter((f) => f.type.startsWith("image/"))
-          .map(async (f) => ({
-            id: Date.now() + Math.random(),
-            type: "image",
-            src: await compressImage(f, 700, 0.66),
-            name: f.name,
-            x: 8 + Math.random() * 55,
-            y: 8 + Math.random() * 50,
-            w: 170,
-          }))
+        files.filter((f) => f.type.startsWith("image/")).map(async (f) => ({
+          id: Date.now() + Math.random(),
+          type: "image",
+          src: await compressImage(f, 700, 0.66),
+          name: f.name,
+          x: 8 + Math.random() * 55,
+          y: 8 + Math.random() * 50,
+          w: 170,
+        }))
       );
 
       setBoard((p) => [...p, ...images]);
@@ -620,50 +613,19 @@ function WorkspaceView({ section, subarea, onBack }) {
           <h2 className="pf" style={{ fontSize: "18px", color: "#5d3060", fontWeight: 700 }}>{getEmoji(subarea)} {subarea}</h2>
         </div>
       </div>
-<div
-  className="glass-sm"
-  style={{
-    margin: "14px 16px 4px",
-    padding: "16px",
-    flexShrink: 0,
-    borderRadius: "20px",
-    background: "rgba(255,255,255,0.65)",
-    border: "1px solid #fce4ec"
-  }}
->
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      marginBottom: "10px"
-    }}
-  >
-    <span style={{ fontSize: "20px" }}>✨</span>
 
-    <h3
-      className="pf"
-      style={{
-        fontSize: "17px",
-        color: "#5d3060",
-        margin: 0
-      }}
-    >
-      Smart Insight for {subarea}
-    </h3>
-  </div>
+      <div className="glass-sm" style={{ margin: "14px 16px 4px", padding: "16px", flexShrink: 0, borderRadius: "20px", background: "rgba(255,255,255,0.65)", border: "1px solid #fce4ec" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+          <span style={{ fontSize: "20px" }}>✨</span>
+          <h3 className="pf" style={{ fontSize: "17px", color: "#5d3060", margin: 0 }}>
+            Smart Insight for {subarea}
+          </h3>
+        </div>
+        <p style={{ fontSize: "13px", color: "#7c4d7e", lineHeight: 1.7, margin: 0 }}>
+          {generateGuide(section, subarea)}
+        </p>
+      </div>
 
-  <p
-    style={{
-      fontSize: "13px",
-      color: "#7c4d7e",
-      lineHeight: 1.7,
-      margin: 0
-    }}
-  >
-    {generateGuide(section, subarea)}
-  </p>
-</div>
       <div style={{ display: "flex", gap: "4px", padding: "10px 16px 0", overflowX: "auto", flexShrink: 0 }}>
         {TABS.map((t) => (
           <button
@@ -708,7 +670,6 @@ function WorkspaceView({ section, subarea, onBack }) {
                   <p style={{ fontSize: "11px", color: "rgba(124,77,126,0.5)", marginTop: "8px" }}>{n.date}</p>
                 </div>
               ))}
-
               {notes.length === 0 && <Empty e="📝" t="No notes yet. Add your first one." />}
             </div>
           </div>
@@ -732,7 +693,6 @@ function WorkspaceView({ section, subarea, onBack }) {
                   <a href={l.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: "12px", color: "#c084fc", wordBreak: "break-all" }}>{l.url}</a>
                 </div>
               ))}
-
               {links.length === 0 && <Empty e="🔗" t="No links saved yet." />}
             </div>
           </div>
@@ -753,7 +713,6 @@ function WorkspaceView({ section, subarea, onBack }) {
                   <p style={{ fontSize: "12px", color: "#7c4d7e", lineHeight: 1.5 }}>{id.text}</p>
                 </div>
               ))}
-
               {ideas.length === 0 && <div style={{ gridColumn: "1/-1" }}><Empty e="💡" t="No ideas yet. Start capturing your sparks." /></div>}
             </div>
           </div>
@@ -773,7 +732,6 @@ function WorkspaceView({ section, subarea, onBack }) {
                   <button onClick={() => setImgs((p) => p.filter((i) => i.id !== img.id))} style={{ position: "absolute", top: "6px", right: "6px", background: "rgba(255,255,255,0.85)", border: "none", cursor: "pointer", borderRadius: "50%", width: "22px", height: "22px", fontSize: "11px", color: "#f48fb1" }}>✕</button>
                 </div>
               ))}
-
               {imgs.length === 0 && <div style={{ gridColumn: "1/-1" }}><Empty e="🖼️" t="No images yet. Upload some inspiration." /></div>}
             </div>
           </div>
@@ -867,7 +825,6 @@ function WorkspaceView({ section, subarea, onBack }) {
                   <p style={{ fontSize: "11px", color: "#f9a8d4", marginTop: "8px" }}>{g.date}</p>
                 </div>
               ))}
-
               {guide.length === 0 && <Empty e="✨" t="Generate your first message for this space." />}
             </div>
           </div>
