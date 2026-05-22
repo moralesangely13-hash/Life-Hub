@@ -253,44 +253,239 @@ function generateGuide(section, subarea) {
 
 function MiniCalendar() {
   const [m, setM] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [itemText, setItemText] = useState("");
+  const [calendarTasks, setCalendarTasks] = useLS("bloom_calendar_tasks", {});
+
   const y = m.getFullYear();
   const mo = m.getMonth();
   const fd = new Date(y, mo, 1).getDay();
   const dim = new Date(y, mo + 1, 0).getDate();
-  const tn = new Date().getDate();
-  const tm = new Date().getMonth();
-  const ty = new Date().getFullYear();
+
+  const today = new Date();
+  const tn = today.getDate();
+  const tm = today.getMonth();
+  const ty = today.getFullYear();
+
   const cells = [...Array(fd).fill(null), ...Array.from({ length: dim }, (_, i) => i + 1)];
 
+  const dateKey = (day) => {
+    const mm = String(mo + 1).padStart(2, "0");
+    const dd = String(day).padStart(2, "0");
+    return `${y}-${mm}-${dd}`;
+  };
+
+  const addChecklistItem = () => {
+    if (!itemText.trim() || !selectedDate) return;
+
+    setCalendarTasks((prev) => ({
+      ...prev,
+      [selectedDate]: [
+        ...(prev[selectedDate] || []),
+        { id: Date.now(), text: itemText.trim(), done: false }
+      ]
+    }));
+
+    setItemText("");
+  };
+
+  const toggleChecklistItem = (id) => {
+    setCalendarTasks((prev) => ({
+      ...prev,
+      [selectedDate]: (prev[selectedDate] || []).map((item) =>
+        item.id === id ? { ...item, done: !item.done } : item
+      )
+    }));
+  };
+
+  const deleteChecklistItem = (id) => {
+    setCalendarTasks((prev) => ({
+      ...prev,
+      [selectedDate]: (prev[selectedDate] || []).filter((item) => item.id !== id)
+    }));
+  };
+
   return (
-    <div className="nu" style={{ padding: "16px" }}>
+    <div className="nu" style={{ padding: "16px", position: "relative" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
         <button onClick={() => setM(new Date(y, mo - 1))} style={{ background: "none", border: "none", cursor: "pointer", color: "#f48fb1", fontSize: "18px" }}>‹</button>
-        <span style={{ fontSize: "13px", fontWeight: 700, color: "#7c4d7e" }}>{m.toLocaleString("default", { month: "long" })} {y}</span>
+
+        <span style={{ fontSize: "13px", fontWeight: 700, color: "#7c4d7e" }}>
+          {m.toLocaleString("default", { month: "long" })} {y}
+        </span>
+
         <button onClick={() => setM(new Date(y, mo + 1))} style={{ background: "none", border: "none", cursor: "pointer", color: "#f48fb1", fontSize: "18px" }}>›</button>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: "3px", textAlign: "center" }}>
         {["S", "M", "T", "W", "T", "F", "S"].map((d, i) => (
-          <div key={i} style={{ fontSize: "11px", color: "#f9a8d4", fontWeight: 700, padding: "3px 0" }}>{d}</div>
-        ))}
-
-        {cells.map((d, i) => (
-          <div
-            key={i}
-            style={{
-              fontSize: "12px",
-              padding: "4px 0",
-              borderRadius: "50%",
-              background: d === tn && mo === tm && y === ty ? "linear-gradient(135deg,#f9a8d4,#c084fc)" : "transparent",
-              color: d === tn && mo === tm && y === ty ? "#fff" : d ? "#7c4d7e" : "transparent",
-              fontWeight: d === tn && mo === tm && y === ty ? 700 : 400,
-            }}
-          >
-            {d || ""}
+          <div key={i} style={{ fontSize: "11px", color: "#f9a8d4", fontWeight: 700, padding: "3px 0" }}>
+            {d}
           </div>
         ))}
+
+        {cells.map((d, i) => {
+          const key = d ? dateKey(d) : null;
+          const hasTasks = key && calendarTasks[key]?.length > 0;
+
+          return (
+            <button
+              key={i}
+              disabled={!d}
+              onClick={() => d && setSelectedDate(key)}
+              style={{
+                fontSize: "12px",
+                padding: "6px 0",
+                borderRadius: "999px",
+                border: "none",
+                cursor: d ? "pointer" : "default",
+                background: d === tn && mo === tm && y === ty
+                  ? "linear-gradient(135deg,#f9a8d4,#c084fc)"
+                  : hasTasks
+                    ? "#fce4ec"
+                    : "transparent",
+                color: d === tn && mo === tm && y === ty ? "#fff" : d ? "#7c4d7e" : "transparent",
+                fontWeight: d === tn && mo === tm && y === ty ? 700 : 500,
+                fontFamily: "Nunito,sans-serif"
+              }}
+            >
+              {d || ""}
+            </button>
+          );
+        })}
       </div>
+
+      {selectedDate && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.18)",
+            zIndex: 999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px"
+          }}
+        >
+          <div
+            className="glass"
+            style={{
+              width: "min(420px, 100%)",
+              maxHeight: "80vh",
+              overflowY: "auto",
+              padding: "20px",
+              borderRadius: "24px",
+              background: "linear-gradient(135deg,#fff7fb,#fdf4ff)"
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+              <div>
+                <h3 className="pf" style={{ fontSize: "20px", color: "#5d3060" }}>
+                  Daily Checklist 🌸
+                </h3>
+                <p style={{ fontSize: "12px", color: "#f48fb1" }}>{selectedDate}</p>
+              </div>
+
+              <button
+                onClick={() => setSelectedDate(null)}
+                style={{
+                  background: "#fce4ec",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: "30px",
+                  height: "30px",
+                  cursor: "pointer",
+                  color: "#f48fb1",
+                  fontWeight: 700
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ display: "flex", gap: "8px", marginBottom: "14px" }}>
+              <input
+                className="inp"
+                value={itemText}
+                onChange={(e) => setItemText(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addChecklistItem()}
+                placeholder="Add something for this day..."
+              />
+
+              <button
+                className="btn"
+                onClick={addChecklistItem}
+                style={{
+                  background: "linear-gradient(135deg,#f9a8d4,#c084fc)",
+                  flexShrink: 0
+                }}
+              >
+                +
+              </button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {(calendarTasks[selectedDate] || []).map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "10px 12px",
+                    borderRadius: "14px",
+                    background: "rgba(255,255,255,0.75)",
+                    border: "1px solid #fce4ec"
+                  }}
+                >
+                  <button
+                    onClick={() => toggleChecklistItem(item.id)}
+                    style={{
+                      width: "18px",
+                      height: "18px",
+                      borderRadius: "50%",
+                      border: "2px solid #f9a8d4",
+                      background: item.done ? "#f9a8d4" : "transparent",
+                      cursor: "pointer"
+                    }}
+                  />
+
+                  <span
+                    style={{
+                      flex: 1,
+                      fontSize: "13px",
+                      color: item.done ? "#c084fc" : "#7c4d7e",
+                      textDecoration: item.done ? "line-through" : "none"
+                    }}
+                  >
+                    {item.text}
+                  </span>
+
+                  <button
+                    onClick={() => deleteChecklistItem(item.id)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#f48fb1",
+                      fontSize: "14px"
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+
+              {(calendarTasks[selectedDate] || []).length === 0 && (
+                <p style={{ textAlign: "center", fontSize: "12px", color: "#f9a8d4", fontStyle: "italic", padding: "18px" }}>
+                  No checklist yet. Add your first task ✨
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
