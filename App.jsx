@@ -39,19 +39,19 @@ const QUOTES = [
   "You are the main character 🎀",
 ];
 
-const MOODS = [
-  { e: "🌸", l: "blooming" },
-  { e: "✨", l: "inspired" },
-  { e: "🍵", l: "cozy" },
-  { e: "😴", l: "tired" },
-  { e: "🌧️", l: "meh" },
-  { e: "💪", l: "motivated" },
-  { e: "😰", l: "anxious" },
-  { e: "🥰", l: "grateful" },
-  { e: "🌈", l: "happy" },
-  { e: "🫠", l: "overwhelmed" },
-  { e: "🍓", l: "excited" },
-  { e: "🌻", l: "hopeful" },
+const moods = [
+  { emoji: '🌸', label: 'blooming' },
+  { emoji: '✨', label: 'inspired' },
+  { emoji: '🛋️', label: 'cozy' },
+  { emoji: '😴', label: 'tired' },
+  { emoji: '🌧️', label: 'meh' },
+  { emoji: '💪', label: 'motivated' },
+  { emoji: '😰', label: 'anxious' },
+  { emoji: '🥰', label: 'grateful' },
+  { emoji: '🌈', label: 'happy' },
+  { emoji: '🫠', label: 'overwhelmed' },
+  { emoji: '🍓', label: 'excited' },
+  { emoji: '🌻', label: 'hopeful' }
 ];
 
 const HABITS = [
@@ -599,7 +599,50 @@ function WorkspaceView({ section, subarea, onBack }) {
           <h2 className="pf" style={{ fontSize: "18px", color: "#5d3060", fontWeight: 700 }}>{getEmoji(subarea)} {subarea}</h2>
         </div>
       </div>
+<div
+  className="glass-sm"
+  style={{
+    margin: "14px 16px 4px",
+    padding: "16px",
+    flexShrink: 0,
+    borderRadius: "20px",
+    background: "rgba(255,255,255,0.65)",
+    border: "1px solid #fce4ec"
+  }}
+>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      marginBottom: "10px"
+    }}
+  >
+    <span style={{ fontSize: "20px" }}>✨</span>
 
+    <h3
+      className="pf"
+      style={{
+        fontSize: "17px",
+        color: "#5d3060",
+        margin: 0
+      }}
+    >
+      Smart Insight for {subarea}
+    </h3>
+  </div>
+
+  <p
+    style={{
+      fontSize: "13px",
+      color: "#7c4d7e",
+      lineHeight: 1.7,
+      margin: 0
+    }}
+  >
+    {generateGuide(section, subarea)}
+  </p>
+</div>
       <div style={{ display: "flex", gap: "4px", padding: "10px 16px 0", overflowX: "auto", flexShrink: 0 }}>
         {TABS.map((t) => (
           <button
