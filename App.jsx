@@ -1197,7 +1197,7 @@ function Sidebar({ open, setOpen, onHome, onSection, onSub, currentSection }) {
         )}
 
         <nav className="scroll" style={{ flex: 1, overflowY: "auto", padding: "4px 0" }}>
-          <button onClick={handleHomeClick} className="nu" style={{ width: "100%", display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", color: "#7c4d7e", fontSize: "13px", fontWeight: 600 }}>
+          <button title="Dashboard" aria-label="Dashboard" onClick={handleHomeClick} className="nu" style={{ width: "100%", display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px", background: "none", border: "none", cursor: "pointer", color: "#7c4d7e", fontSize: "13px", fontWeight: 600 }}>
             <span style={{ fontSize: "17px", flexShrink: 0 }}>🏠</span>
             {open && <span>Dashboard</span>}
           </button>
@@ -1212,6 +1212,8 @@ function Sidebar({ open, setOpen, onHome, onSection, onSub, currentSection }) {
             return (
               <div key={s.id}>
                 <button
+                  title={s.label}
+                  aria-label={s.label}
                   onClick={() => handleCategoryClick(s)}
                   className="nu"
                   style={{
@@ -1265,8 +1267,8 @@ function Sidebar({ open, setOpen, onHome, onSection, onSub, currentSection }) {
           })}
         </nav>
 
-        <button onClick={() => setOpen((p) => !p)} className="nu" style={{ padding: "12px", borderTop: "1px solid #fce4ec", background: "none", border: "none", cursor: "pointer", color: "#f9a8d4", fontSize: "12px", fontWeight: 700 }}>
-          {open ? "← collapse" : "→"}
+        <button title={open ? "Collapse sidebar" : "Expand sidebar"} aria-label={open ? "Collapse sidebar" : "Expand sidebar"} onClick={() => setOpen((p) => !p)} className="nu" style={{ padding: "12px", borderTop: "1px solid #fce4ec", background: "none", border: "none", cursor: "pointer", color: "#f9a8d4", fontSize: "12px", fontWeight: 700 }}>
+          {open ? "← collapse" : "→ menu"}
         </button>
       </div>
     </>
